@@ -75,6 +75,13 @@ class BD(private val context: Context): SQLiteOpenHelper(context, DBNAME, null, 
         query.close()
         return user
     }
+    fun cursoyaagregado(IDcurso: Int, IDuser: Int):Boolean{
+        val IDs = arrayOf(IDcurso.toString(),IDuser.toString())
+        val query = readableDatabase.query("cursos_usuario", null, "idcurso = ? AND iduser = ?", IDs, null, null,null)
+        val coincidencias = query.count > 0
+        query.close()
+        return coincidencias
+    }
     fun cursoexist(name:String):Boolean{
         val name = arrayOf(name)
         val query = readableDatabase.query("Cursos", null, "nombre = ?", name, null, null, null)
@@ -88,6 +95,13 @@ class BD(private val context: Context): SQLiteOpenHelper(context, DBNAME, null, 
             put("pass", pass)
         }
         return writableDatabase.insert("usuarios", null, valores)
+    }
+    fun añadirFavorito(IDcurso: Int, IDuser:Int):Long{
+        val valores = ContentValues().apply {
+            put("idcurso", IDcurso)
+            put("iduser", IDuser)
+        }
+        return writableDatabase.insert("cursos_usuario", null, valores)
     }
     fun nuevocurso(name: String, contenido: String): Long{
         val valores = ContentValues().apply {
@@ -132,6 +146,34 @@ class BD(private val context: Context): SQLiteOpenHelper(context, DBNAME, null, 
         val cursor = readableDatabase.query("Cursos", null, "idcurso = ?", values, null, null, null)
         return cursor
     }
+    fun getCurso_user( IDuser: Int): List<Cursor>{
+        val cursoCursors = mutableListOf<Cursor>()
+        val cursoUserCursor = readableDatabase.query(
+            "cursos_usuario",
+            null,
+            "iduser = ?",
+            arrayOf(IDuser.toString()),
+            null,
+            null,
+            null
+        )
+        cursoUserCursor.use { cursor ->
+            while (cursor.moveToNext()) {
+                val cursoID = cursor.getInt(cursor.getColumnIndexOrThrow("idcurso"))
+                val cursoCursor = readableDatabase.query(
+                    "Cursos",
+                    null,
+                    "idcurso = ?",
+                    arrayOf(cursoID.toString()),
+                    null,
+                    null,
+                    null
+                )
+                cursoCursors.add(cursoCursor)
+            }
+        }
+        return cursoCursors
+    }
     fun getPrueba(IDcurso: Int):Cursor?{
         val values = arrayOf(IDcurso.toString())
         val cursor = readableDatabase.query("Prueba", null, "idcurso = ?", values, null, null, null)
@@ -139,6 +181,10 @@ class BD(private val context: Context): SQLiteOpenHelper(context, DBNAME, null, 
     }
     fun eliminarCurso(id: Int): Boolean {
         val query = writableDatabase.delete("Cursos", "idcurso = ?", arrayOf(id.toString()))
+        return query > 0
+    }
+    fun eliminarmicurso(id: Int):Boolean{
+        val query = writableDatabase.delete("cursos_usuario", "idcurso = ?", arrayOf(id.toString()))
         return query > 0
     }
     fun actualizarCurso(IDcurso: Int, Titulo: String, contenido: String):Boolean{

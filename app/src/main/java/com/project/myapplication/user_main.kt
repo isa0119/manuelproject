@@ -17,6 +17,16 @@ class user_main : AppCompatActivity() {
         textView.text = "Bienvenido ${SP.user}"
         val btnCerrar:Button = findViewById(R.id.CerrarSesion)
         btnCerrar.setOnClickListener { CerrarSesion() }
+        val btnCursos:Button = findViewById(R.id.Cursos)
+        btnCursos.setOnClickListener {
+            val intent = Intent(this, cursos::class.java)
+            startActivity(intent)
+        }
+        val btnmisCursos:Button = findViewById(R.id.Miscursos)
+        btnmisCursos.setOnClickListener {
+            val intent = Intent(this, mis_cursos::class.java)
+            startActivity(intent)
+        }
 
     }
     fun CerrarSesion(){

@@ -24,6 +24,12 @@ class PreguntasAdapter (private val preguntaslista: List<Pregunta>):RecyclerView
         val opcion3: CheckBox = itemView.findViewById(R.id.opcion3)
     }
 
+    private var puntos = 0
+
+    fun getPuntos(): Int {
+        return puntos
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreguntaViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.pregunta_view, parent, false)
         return PreguntaViewHolder(itemView)
@@ -39,6 +45,7 @@ class PreguntasAdapter (private val preguntaslista: List<Pregunta>):RecyclerView
             if (isChecked) {
                 holder.opcion2.isChecked = false
                 holder.opcion3.isChecked = false
+                evaluarRespuesta(currentItem.respuesta, holder.opcion1)
             }
         }
 
@@ -46,6 +53,7 @@ class PreguntasAdapter (private val preguntaslista: List<Pregunta>):RecyclerView
             if (isChecked) {
                 holder.opcion1.isChecked = false
                 holder.opcion3.isChecked = false
+                evaluarRespuesta(currentItem.respuesta, holder.opcion2)
             }
         }
 
@@ -53,7 +61,13 @@ class PreguntasAdapter (private val preguntaslista: List<Pregunta>):RecyclerView
             if (isChecked) {
                 holder.opcion1.isChecked = false
                 holder.opcion2.isChecked = false
+                evaluarRespuesta(currentItem.respuesta, holder.opcion3)
             }
+        }
+    }
+    private fun evaluarRespuesta(respuestaCorrecta: String, checkBox: CheckBox) {
+        if (checkBox.text.toString() == respuestaCorrecta) {
+            puntos++
         }
     }
 
